@@ -1,6 +1,6 @@
 ﻿--Questions for Lab3--
 --Note: Some of the queries were tricky since some of the data is--
---abreviated. For example, in question7, the months are abreviated.--
+--abbreviated. For example, in question7, the months are abbreviated.--
 
 --Question1--
 select name, city
@@ -9,7 +9,7 @@ where name='Bond'
 --Question2--
 select pid, name, quantity
 from products
-where priceUSD >= 0.99
+where priceUSD > 0.99
 --Question3--
 select ordno, qty
 from orders
@@ -18,7 +18,7 @@ select name, city
 from customers
 where city = 'Duluth'
 --Question5--
-select name, city   --I put in city to show more of a distinction.--
+select name
 from Agents
 where city <> 'New York' and city <> 'London'
 --Question6--
@@ -32,7 +32,7 @@ where mon = 'jan' or mon = 'apr'
 --Question8--
 select *
 from orders
-where mon = 'feb' and dollars > 200  --dollars is not a good title--
+where mon = 'feb' and dollars > 200  --dollars is not a good column title--
 --Question9--
 select *
 from orders
