@@ -36,4 +36,5 @@ where mon = 'feb' and dollars > 200  --dollars is not a good column title--
 --Question9--
 select *
 from orders
-where cid = 'c005' --c005 didn't order anything in this snapshot of the db--
+where cid = 'c005' --c005 did not order anything in this snapshot of the db--
+--Finished, 9/18/2014--
