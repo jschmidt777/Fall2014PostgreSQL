@@ -20,19 +20,24 @@ where city = 'Duluth'
 --Question5--
 select name
 from Agents
-where city <> 'New York' and city <> 'London'
+where city <> 'New York' 
+and city <> 'London'
 --Question6--
 select *
 from products
-where city <> 'Dallas' and city <> 'Duluth' and priceUSD <= 1.00
+where city <> 'Dallas' 
+and city <> 'Duluth' 
+and priceUSD <= 1.00
 --Question7--
 select *
 from orders
-where mon = 'jan' or mon = 'apr'
+where mon = 'jan' 
+or mon = 'apr'
 --Question8--
 select *
 from orders
-where mon = 'feb' and dollars > 200  --dollars is not a good column title--
+where mon = 'feb' 
+and dollars > 200  --dollars is not a good column title--
 --Question9--
 select *
 from orders
