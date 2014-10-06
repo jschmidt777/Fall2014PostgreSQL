@@ -1,27 +1,16 @@
 ﻿--Lab5 Assignment--
 --Joseph Schmidt, started 10/3/2014--
 
---Example subquery--
-select cid
-from orders
-where aid in (select aid
-              from agents
-              where city = 'Dallas')
 --Question1--
-select agents.aid, orders.cid
-from orders
-left join agents on agents.aid = orders.cid
-where customers.name = 'Tiptop'
-
---No clue as to how this should work w/ three tables (orders being involved some how)--
-
-where aid in(select aid
-			 from orders 
-             where cid in (select cid
-						   from customers 
-						   where name = 'Tiptop'
-						   )
-			)		   			
+select distinct a.city
+from orders o,
+     agents a,
+     customers c
+where o.aid = a.aid
+  and o.cid = c.cid
+  and c.name = 'Tiptop'
+order by a.city desc
+			
 --Question2--
 select distinct pid
 from orders
@@ -33,6 +22,21 @@ where aid in(select aid
 						  )
 	        )
 order by pid asc
+
+select distinct o.pid
+from orders o,
+     customers c,
+     agents a
+where o.aid = a.aid
+  and o.cid = c.cid
+  and c.city = 'Kyoto'
+-- Right now, this gives me the answer that I thought I needed last lab, when in fact there are three results missing.--
+
+select *
+from orders o left outer join customers c
+on o.cid = c.cid
+where c.city = 'Kyoto'
+  
 
 --Question3--
 select name
@@ -46,27 +50,23 @@ from customers c left outer join orders o
 on o.cid = c.cid
 where o.ordno is null
 
---Class helped clear a lot of this up--
+--In general, class helped clear a lot of this up.--
 --Question5--
-select pid 
-from products
-where pid in(select pid 
-			 from orders
-			 where aid in(select aid 
-						  from agents
-						  where aid = 'a04'
-						 )
-			)
+select distinct c.name, a.name
+from orders o,
+     customers c,
+     agents a
+where o.cid = c.cid
+  and o.aid = a.aid
+  and c.city = a.city
+  
 --Question6--
-select name, discount
-from customers 
-where cid in(select cid
-			 from orders
-			 where aid in(select aid
-						  from agents
-						  where city in('Dallas', 'New York')
-						 )
-			)
+select distinct c.name, a.name, c.city
+from orders o,
+     customers c,
+     agents a
+where a.city = c.city
+
 --Question7--
 select *
 from customers
