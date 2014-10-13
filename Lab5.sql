@@ -12,14 +12,14 @@ where o.aid = a.aid
 order by a.city desc
 			
 --Question2--
-with foo as (select o.aid, o.pid
-			 from customers c,
-				  orders o
-			 where o.cid = c.cid
-			   and c.city = 'Kyoto')
+with needed_agents as (select o.aid, o.pid
+					   from customers c,
+							orders o
+					   where o.cid = c.cid
+					   and c.city = 'Kyoto')
 select distinct o.pid
-from orders o inner join foo
-on o.aid = foo.aid
+from orders o inner join needed_agents
+on o.aid = needed_agents.aid
 order by o.pid
 	   
 --Question3--
@@ -52,16 +52,15 @@ from orders o,
 where a.city = c.city
 
 --Question7--
--- I can use a sub query for this one. --
---This is the answer I have. I'm pretty sure it's not all correct because I basically hard code it at the end.--
--- I've tried so many different solutions that I rather just not get all credit for this lab, and keep my sanity.--
 select distinct c.city, c.name
 from customers c right join(
 	 select count(p.city) as num_city, c.name, c.city
-	 from products p,
-		  customers c
-	 where p.city = c.city
+	 from products p inner join customers c
+	 on p.city = c.city
 	 group by c.name, c.city 
-) as foo on c.city = foo.city
-where foo.num_city = 2
---Finished 10/10/2014--
+) as count_cities on c.city = count_cities.city
+where count_cities.num_city = (select count(*)
+							   from products p
+							   group by p.city
+							   order by count(*) asc
+							   limit 1)
