@@ -29,7 +29,7 @@ where cid not in(select cid
 		 from orders)
 		 
 --Question4--
-select c.name
+select distinct c.name
 from customers c left outer join orders o
 on o.cid = c.cid
 where o.ordno is not null
