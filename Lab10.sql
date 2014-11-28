@@ -1,25 +1,5 @@
-﻿--
--- An example stored procedure ("function")
---
-create or replace function get_courses_by_credits(int, REFCURSOR) returns refcursor as 
-$$
-declare
-   num_credits int       := $1;
-   resultset   REFCURSOR := $2;
-begin
-   open resultset for 
-      select num, name, credits
-      from   courses
-       where  credits >= num_credits;
-   return resultset;
-end;
-$$ 
-language plpgsql;
-
-select get_courses_by_credits(4, 'results');
-Fetch all from results;
-
-
+﻿
+--Stored Procedure One--
 create or replace function PreReqsFor(int, REFCURSOR) returns refcursor as
 $$
 declare
@@ -40,6 +20,7 @@ language plpgsql;
 select PreReqsFor(308, 'results');
 fetch all from results;
 
+--Stored Procedure Two--
 create or replace function IsPreReqsFor(int, REFCURSOR) returns refcursor as
 $$
 declare
@@ -56,10 +37,10 @@ end;
 $$
 language plpgsql;   
 
-
 select IsPreReqsFor(308, 'results');
 fetch all from results;
 
+--Honest Attempt For the optional Recursive Stored Procedure--
 drop function allprereqsfor(integer)
 create or replace function AllPreReqsFor(int) returns SETOF prerequisites as
 $$
@@ -77,9 +58,6 @@ $$
 language plpgsql;   
 
 select * from AllPreReqsFor(499);
-fetch all from results;
-
-select * from prerequisites
 
 
    
