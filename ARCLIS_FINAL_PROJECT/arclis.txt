@@ -1,0 +1,511 @@
+﻿--ARCLIS--
+--Authored by Joseph Schmidt--
+--Complete Date: 12/02/2014--
+
+
+--create statements--
+--schools--
+CREATE TABLE schools (
+sid int not null,
+name text not null,
+primary key (sid)
+);
+
+insert into schools (sid, name)
+	values(0, 'Marist College'), 
+	(1, 'Fordham University'), 
+	(2, 'Fordham University at Lincoln Center'),
+	(3, 'NYU');
+
+--people--
+CREATE TABLE people (
+pid int not null,
+sid int not null references schools(sid),
+name text not null,
+dob date not null,
+phone_number text not null,
+email text,
+primary key (pid)
+);
+
+insert into people(pid, sid, name, dob, phone_number, email) 
+	values(0, 0, 'Joseph Schmidt', '1995-10-10', '845-555-5555', 'schmidtjoseph@gmail.com'), 
+	(1, 0, 'Ken Smith', '1969-11-04', '845-555-1234', 'kensmith@gmail.com'), 
+	(2, 1, 'Artemis Fowl', '1959-04-17', '845-123-4567', 'artemisfowl@gmail.com'), 
+	(3, 0, 'John Smith', '1991-04-04', '845-871-4382', 'johnsmith@gmail.com'), 
+	(4, 0,'Mary Smith','1968-10-12', '845-731-3697', 'marysmith@gmail.com'), 
+	(5, 1, 'Catherine Byre', '1942-11-04', '845-987-6543', 'chatherinebyre@gmail.com');
+
+--students--
+CREATE TABLE students (
+sdtid int not null references people(pid),
+student_id_num int not null,
+major text not null,
+primary key (sdtid)
+);
+
+insert into students(sdtid, student_id_num, major) 
+	values(0, 20048857, 'Computer Science'), 
+	(3, 20032852, 'Psychology'),
+	(4, 20029874, 'Mathematics'); 
+
+--cadre--
+CREATE TABLE cadre (
+cid int not null references people(pid),
+rank text not null,
+cadre_role text not null,
+primary key (cid)
+);	
+
+insert into cadre(cid, rank, cadre_role) 
+	values(1, 'MSG', 'Military Science Insructor'), 
+	(2, 'SFC', 'Military Science Instructor'), 
+	(5, 'LTC', 'Professor of Military Science');
+
+--rotc_class--
+CREATE TABLE rotc_class (
+msid int not null references events(eid),
+cid int not null references cadre(cid),
+name text not null,
+begin_time time not null,
+primary key (msid)
+);
+
+insert into rotc_class(msid, cid, name, begin_time) 
+	values(1, 1, 'Military Science 201', '14:00:00');
+	select * from rotc_class
+
+--events--
+CREATE TABLE events (
+eid int not null,
+name text not null,
+date_of_event date not null,
+loc text not null,
+primary key (eid)
+);
+
+insert into events(eid, name, date_of_event, loc) 
+	values(0, 'APFT', '2014-10-08', 'McCann'), 
+	(1, 'MS Class', '2014-10-09', 'St.Anns'), 
+	(2, 'LTC', '2014-07-09', 'Ft.Knox'),
+	(3, 'Air Assault', '2014-06-20', 'Ft.Drum');
+
+--cadets--
+CREATE TABLE cadets (
+cdtid int not null references students(sdtid),
+msid int not null references rotc_class(msid),
+contract_status text not null check
+	(contract_status in ('contracted', 'non-contracted')),
+year_in_rotc int not null,
+cadet_rank text,
+cadet_position text,
+rotc_gpa numeric(3,2) not null,
+scholarship_status text not null,
+primary key (cdtid)
+);	
+
+insert into cadets(cdtid, msid, contract_status, year_in_rotc, cadet_rank, cadet_position, rotc_gpa, scholarship_status) 
+	values(0, 1, 'contracted', 2, 'CPL', 'Web Master', 4.00, '3.5 year'), 
+	(4, 1, 'non-contracted', 2, 'CPL', 'Team Leader', 3.60, 'none');
+
+--recruits--	
+CREATE TABLE recruits (
+rid int not null references students(sdtid),
+interest_in_rotc text not null,
+sla text not null,
+primary key (rid)
+);
+
+insert into recruits(rid, interest_in_rotc, sla) 
+	values(3, 'Be part of something bigger', 'HS track captain, HS varstiy track, NHS member in HS.');
+
+--semester_gpa--
+CREATE TABLE semester_gpa (
+semid int not null,
+sdtid int not null references students(sdtid),
+the_year text not null,
+season text not null check
+	(season in ('fall', 'spring')),
+gpa numeric(3,2) not null,
+primary key (semid, sdtid)
+);
+
+insert into semester_gpa(semid, sdtid, the_year, season, gpa) 
+	values(1, 0, '2014', 'fall', 4.0), 
+	(1, 3, '2014', 'fall', 3.5),
+	(1, 4, '2014', 'fall', 3.6);
+
+
+--equipment--
+CREATE TABLE equipment (
+eqid int not null,
+name text not null,
+qty int not null,
+primary key (eqid)
+);
+
+
+insert into equipment(eqid, name, qty) 
+	values(0, 'ACUs', 20), 
+	(1, 'Ruck', 15),
+	(2, 'Helmet', 10),
+	(3, 'Sleep System', 10),
+	(4, 'MRE', 10);
+
+--equipment_issued--
+CREATE TABLE equipment_issued (
+issueno int not null,
+cdtid int not null references cadets(cdtid),
+eqid int not null references equipment(eqid),
+time_issued timestamp not null,
+primary key (issueno)
+);
+
+insert into equipment_issued(issueno, cdtid, eqid, time_issued) 
+	values(0, 0, 0, '2013-03-23 14:00:00'), 
+	(1, 0, 1, '2013-03-23 14:00:00'),
+	(2, 0, 2, '2013-03-23 14:00:00'),
+	(3, 0, 3, '2013-03-23 14:00:00'),
+	(4, 0, 4, '2013-03-23 14:00:00'),
+	(5, 4, 0, '2013-03-23 15:00:00');
+
+--activities--	
+CREATE TABLE activities (
+actid int not null,
+name text not null,
+primary key (actid)
+);
+
+insert into activities(actid, name) 
+	values(0, 'Colorguard'), 
+	(1, 'Ranger challenge'),
+	(2, '10 miler team'),
+	(3, 'Intramural Dodgeball'),
+	(4, 'Varstity Rugby'),
+	(5, 'Campus Ministry'),
+	(6, 'Blood drive donor');
+
+--rotc_activities--
+CREATE TABLE rotc_activities (
+raid int not null references activities(actid) ,
+primary key (raid)
+);
+
+insert into rotc_activities(raid) 
+	values(0), 
+	(1),
+	(2);
+
+--other_activities--
+CREATE TABLE other_activities (
+oaid int not null references activities(actid),
+primary key (oaid)
+);
+
+insert into other_activities(oaid) 
+	values(3), 
+	(4),
+	(5),
+	(6);
+
+--activities_involvement--
+CREATE TABLE activities_involvement (
+cdtid int not null references cadets(cdtid),
+actid int not null references activities(actid),
+primary key (cdtid, actid)
+);
+
+insert into activities_involvement(cdtid, actid) 
+	values(0, 0), 
+	(0, 3),
+	(0, 5),
+	(0, 6),
+	(4, 4),
+	(4, 5),
+	(4, 6);
+
+	select * from activities_involvement
+--awards--
+CREATE TABLE awards (
+aid int not null ,
+name text not null,
+criteria text not null,
+primary key (aid)
+);
+
+insert into awards(aid, name, criteria) 
+	values(0, 'Community Service ribbon', 'Participate in at least two community service activities'), 
+	(1, 'Intramural/Varsity Athelete ribbon', 'Participate in at least one sport (varsity or intramural'),
+	(2, 'Colorguard ribbon', 'Be part of the colorguard team'),
+	(3, 'Presidential fitness award', 'Score at least a 290 on the APFT');
+
+--awards_received--
+CREATE TABLE awards_received (
+cdtid int not null references cadets(cdtid),
+aid int not null references awards(aid),
+time_received timestamp not null,
+primary key (cdtid, aid, time_received)
+);
+
+
+insert into awards_received(cdtid, aid, time_received) 
+	values(0, 0, '2013-04-10 14:00:00'), 
+	(0, 1, '2013-04-10 14:00:00'),
+	(0, 2, '2013-04-10 14:00:00'),
+	(0, 3, '2013-04-10 14:00:00'),
+	(4, 0, '2013-04-10 14:05:00'),
+	(4, 1, '2013-04-10 14:05:00');
+
+--summer_training--
+CREATE TABLE summer_training (
+sumid int not null references events(eid),
+primary key (sumid)
+);
+
+insert into summer_training(sumid) 
+	values(2), 
+	(3);
+
+--apfts--
+CREATE TABLE apfts (
+apftid int not null references events(eid),
+cdtid int not null references cadets(cdtid),
+gid int not null references cadre(cid),
+score int not null check (score >= 0 and score <= 300),
+primary key (apftid, cdtid, gid)
+);
+
+
+insert into apfts(apftid, cdtid, gid, score) 
+	values(0, 0, 1, 292), 
+	(0, 4, 1, 270);
+
+--events_attended--
+CREATE TABLE events_attended (
+cdtid int not null references cadets(cdtid),
+eid int not null references events(eid),
+primary key (cdtid, eid)
+);
+
+insert into events_attended(cdtid, eid) 
+	values(0, 0), 
+	(0, 1), 
+	(4, 0),
+	(4, 1);
+	
+--views--
+--attendance--
+create view attendance as
+select c.cdtid, p.name as Cadet_Name, e.name as Event_Name, e.date_of_event
+from events_attended ea inner join events e
+on ea.eid = e.eid
+inner join cadets c
+on ea.cdtid = c.cdtid
+inner join students s
+on c.cdtid = s.sdtid
+inner join people p 
+on s.sdtid = p.pid
+order by Event_Name asc,
+	 c.cdtid asc
+ 
+--same view statement that could have been done this way--
+select c.cdtid, p.name, e.name, e.date_of_event
+from events_attended ea,
+     events e,
+     cadets c,
+     students s,
+     people p
+where ea.eid = e.eid
+  and ea.cdtid = c.cdtid
+  and c.cdtid = s.sdtid
+  and s.sdtid = p.pid
+order by e.name asc,
+	 c.cdtid asc
+
+--reports--     
+--equipment check report--
+select c.cdtid, p.name as Cadet, e.name as Equipment
+from cadets c inner join equipment_issued ei
+on ei.cdtid = c.cdtid
+inner join students s
+on c.cdtid = s.sdtid
+inner join people p
+on s.sdtid = p.pid
+inner join equipment e
+on ei.eqid = e.eqid
+
+
+--awards for activiites--
+select c.cdtid, p.name as Cadet, a.name
+from cadets c inner join activities_involvement ai
+on ai.cdtid = c.cdtid
+inner join students s
+on c.cdtid = s.sdtid
+inner join people p
+on s.sdtid = p.pid
+inner join activities a
+on ai.actid = a.actid
+
+--awards for pt--
+select c.cdtid, p.name as Cadet, pt.score
+from cadets c inner join apfts pt
+on pt.cdtid = c.cdtid
+inner join students s
+on c.cdtid = s.sdtid
+inner join people p
+on s.sdtid = p.pid
+
+--stored procedures and triggers--
+--cadet equipment check--
+
+create or replace function equipment_check_for(text, REFCURSOR) returns refcursor as 
+$$
+declare
+	cadetName text       :=$1;
+	resultset REFCURSOR  :=$2;
+begin 
+   open resultset for 
+   select c.cdtid, p.name as Cadet, e.name as Equipment
+   from cadets c inner join equipment_issued ei
+   on ei.cdtid = c.cdtid
+   inner join students s
+   on c.cdtid = s.sdtid
+   inner join people p
+   on s.sdtid = p.pid
+   inner join equipment e
+   on ei.eqid = e.eqid
+   where p.name like '%'||cadetName||'%';
+   return resultset;
+end;	
+$$
+language plpgsql;   
+
+select equipment_check_for('Joseph Schmidt', 'results');
+fetch all from results; 
+
+--subtract from qty--
+drop function subtract_from_qty()
+create or replace function subtract_from_qty() returns trigger as 
+$$
+begin
+   update equipment 
+   set qty = qty - 1 
+   where equipment.eqid = (select ei.eqid 
+			   from equipment_issued ei 
+			   where ei.issueno = (select max(issueno) 
+					       from equipment_issued
+		                              )
+		          );
+   return NEW;
+   if NEW = 0 then
+   return 'Last Equipment item issued';
+   end if;
+end;
+$$
+language plpgsql;
+
+--trigger for this procedure--
+drop trigger subtract_from_qty on equipment_issued
+create trigger subtract_from_qty
+after insert on equipment_issued
+ for each statement execute procedure subtract_from_qty();
+
+insert into equipment_issued(issueno, cdtid, eqid, time_issued) 
+	values(6, 0, 0, '2014-12-02 14:00:00');
+
+
+--add to qty (may need an extra subquey)--	
+create or replace function add_to_qty() returns trigger as 
+$$
+begin
+   update equipment 
+   set qty = qty + 1 
+   where equipment.eqid = (select ei.eqid 
+			   from equipment_issued ei 
+			   where ei.issueno = (select max(issueno) 
+					       from equipment_issued
+		                              )
+		          );
+   return NEW;
+end;
+$$
+language plpgsql;
+
+--trigger for this procedure--
+create trigger add_to_qty
+after delete on equipment_issued
+ for each statement execute procedure add_to_qty();
+
+delete from equipment_issued where issueno = 0
+
+--cumulGPA--
+create or replace function cumulGPA(text, REFCURSOR) returns refcursor as 
+$$
+declare
+	cadetName text       :=$1;
+	resultset REFCURSOR  :=$2;
+begin
+open resultset for 
+select s.sdtid, p.name, avg(gpa)
+from semester_gpa sg inner join students s 
+on s.sdtid = sg.sdtid
+inner join people p
+on p.pid = s.sdtid
+where p.name like '%'||cadetName||'%'
+group by s.sdtid, p.name;
+
+return resultset;
+end;	
+$$
+language plpgsql;   
+
+insert into semester_gpa(semid, sdtid, the_year, season, gpa) 
+	values(0, 0, '2013', 'fall', 3.95)
+
+
+select cumulGPA('Joseph Schmidt', 'results');
+fetch all from results; 
+
+
+--security--
+--admin--
+CREATE ROLE arclis_admin;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO arclis_admin;
+
+
+--instructor--
+CREATE ROLE instructor;
+GRANT SELECT ON attendance TO instructor;
+GRANT SELECT, UPDATE, INSERT ON people TO instructor;
+GRANT SELECT, UPDATE, INSERT, DELETE ON cadets TO instructor;
+GRANT SELECT, UPDATE, INSERT, DELETE ON students TO instructor;
+GRANT SELECT, UPDATE, INSERT ON schools TO instructor;
+GRANT SELECT, UPDATE, INSERT, DELETE ON recruits TO instructor;
+GRANT SELECT, UPDATE, INSERT ON semester_gpa TO instructor;
+GRANT SELECT, UPDATE, INSERT, DELETE ON cadre TO instructor;
+GRANT SELECT, UPDATE, INSERT ON events TO instructor;
+GRANT SELECT, UPDATE, INSERT ON events_attended TO instructor;
+GRANT SELECT, UPDATE, INSERT ON rotc_class TO instructor;
+GRANT SELECT, UPDATE, INSERT ON equipment TO instructor;
+GRANT SELECT, UPDATE, INSERT, DELETE ON equipment_issued TO instructor;
+GRANT SELECT, UPDATE, INSERT ON activities TO instructor;
+GRANT SELECT, UPDATE, INSERT ON rotc_activities TO instructor;
+GRANT SELECT, UPDATE, INSERT ON other_activities TO instructor;
+GRANT SELECT, UPDATE, INSERT ON activities_involvement TO instructor;
+GRANT SELECT, UPDATE, INSERT ON awards TO instructor;
+GRANT SELECT, UPDATE, INSERT ON awards_received TO instructor;
+GRANT SELECT, UPDATE, INSERT ON summer_training TO instructor;
+GRANT SELECT, UPDATE, INSERT ON apfts TO instructor;
+
+
+--cadet_officer--
+CREATE ROLE cadet_officer
+GRANT SELECT ON attendance TO cadet_officer;
+GRANT SELECT, UPDATE, INSERT ON events TO instructor;
+GRANT SELECT, UPDATE, INSERT ON events_attended TO instructor;
+GRANT SELECT, UPDATE, INSERT ON equipment TO instructor;
+GRANT SELECT, UPDATE, INSERT, DELETE ON equipment_issued TO instructor;
+
+
+
+
